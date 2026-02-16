@@ -6,51 +6,28 @@
 
 [rewrite_local]
 
-^https?:\/\/baimiao\.uzero\.cn\/api\/v\d\.user\/appLaunchWithUser$ url script-response-body https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/baimiao.js
+[rewrite_local]
+^https:\/\/api\.flightyapp\.com\/v1\/sync\/full url script-response-body https://github.com/Asiru0/in_app_purchase/raw/refs/heads/main/flighty.js
 
 [mitm] 
 
-hostname = baimiao.uzero.cn
+hostname = api.flightyapp.com
 
 *******************************/
 
-// 解析响应体
-let obj = JSON.parse($response.body);
+// 简单的二进制替换测试
+let body = $response.body;
+let hex = Array.from(new Uint8Array(body))
+               .map(b => b.toString(16).padStart(2, '0'))
+               .join('');
 
-// 注入伪造的 VIP 信息
-obj['value']['vip'] = {
-    'id': 999999,
-    'userId': 9999999,
-    'levelId': 2,
-    'deadline': 9999999999,
-    'boughtType': 'new',
-    'boughtTime': 1586253524,
-    'boughtDuration': 10,
-    'boughtUnit': 'year',
-    'boughtAmount': 30,
-    'orderId': 999999,
-    'deadlineNotified': 0,
-    'operatorId': 0,
-    'createdTime': 1586253524,
-    'level': {
-        'id': 2,
-        'seq': 2,
-        'name': '黄金会员',
-        'icon': '',
-        'picture': '',
-        'monthPrice': 0.02,
-        'yearPrice': 30,
-        'description': '',
-        'recognizeNormal': -100,
-        'recognizeBatch': -100,
-        'recognizeTranslate': -100,
-        'recognizeTranslateAll': 1,
-        'enabled': 1,
-        'gived': 0,
-        'createdTime': 1429246047,
-        'maxRate': 100
-    }
-};
+// 尝试将 WEEKLY (5745454b4c59) 替换为 ANNUAL (414e4e55414c)
+// 注意：两者长度必须相等，否则会崩溃
+if (hex.indexOf('5745454b4c59') !== -1) {
+    console.log("找到 WEEKLY，尝试替换为 ANNUAL...");
+    hex = hex.replace('5745454b4c59', '414e4e55414c');
+}
 
-// 结束处理，返回修改后的数据
-$done({'body': JSON.stringify(obj)});
+// 将修改后的 Hex 转回 ArrayBuffer
+let newBody = new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+$done({ body: newBody.buffer });

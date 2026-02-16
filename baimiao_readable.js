@@ -6,7 +6,7 @@
 
 [rewrite_local]
 
-^https?:\/\/baimiao\.uzero\.cn\/api\/v\d\.user\/appLaunchWithUser$ url script-response-body https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/baimiao.js
+^https?:\/\/baimiao\.uzero\.cn\/api\/v\d\.user\/appLaunchWithUser$ url script-response-body https://github.com/Asiru0/in_app_purchase/raw/refs/heads/main/baimiao_readable.js
 
 [mitm] 
 
